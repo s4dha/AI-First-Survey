@@ -39,11 +39,11 @@ const storage = {
 
 // Prepare the payload for Google Sheets (human-readable)
 const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) => {
-    const payload: any = {};
+    // 1. Create payload with 'Submitted At' as the very first key
+    const payload: any = {
+        'Submitted At': new Date().toLocaleString()
+    };
     
-    // Add submitted timestamp explicitly (though sheet script also does it)
-    payload['Submitted At'] = new Date().toLocaleString();
-
     surveyData.forEach(section => {
         section.questions.forEach(q => {
             const value = formData[q.id];
@@ -52,11 +52,11 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
 
             // Helper to find label from options
             const findLabel = (val: string, opts: Option[]) => {
-                const opt = opts.find(o => o.value === val);
+                const opt = opts?.find(o => o.value === val);
                 return opt ? opt.label : val;
             }
 
-            // Handle different question types to format the output string
+            // Calculate Answer Label
             if (q.type === QuestionType.CHECKBOX || q.type === QuestionType.MULTI_SELECT_CHECKBOX || q.type === QuestionType.CHECKBOX_WITH_TEXT || q.type === QuestionType.GROUPED_CHECKBOX) {
                 if (Array.isArray(value)) {
                     answerLabel = value.map(val => {
@@ -80,16 +80,6 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
                              answerLabel += ` (${formData[otherKey]})`;
                          }
                     }
-
-                    // Handle Subquestion
-                    if (q.subQuestion && Array.isArray(q.subQuestion.triggerValues) && q.subQuestion.triggerValues.includes(String(value))) {
-                        const subVal = formData[q.subQuestion.id];
-                        if (subVal) {
-                           const subLabel = findLabel(subVal, q.subQuestion.options);
-                           // Add subquestion response as a separate column for clarity
-                           payload[q.subQuestion.text] = subLabel;
-                        }
-                    }
                 }
             } else if (q.type === QuestionType.SLIDER_PAIR) {
                 const before = formData[`${q.id}_before`];
@@ -101,8 +91,24 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
                 answerLabel = value !== undefined ? String(value) : "";
             }
 
-            // Use the Question Text as the Header Key
+            // 2. Add Main Question Key
             payload[q.text] = answerLabel;
+
+            // 3. Add Sub-Question Key IMMEDIATELY after Main Question
+            if (q.type === QuestionType.CONDITIONAL_RADIO && q.subQuestion) {
+                 let subLabel = "";
+                 // Check if the main value triggers the subquestion
+                 if (value !== undefined && value !== null && value !== "") {
+                    if (Array.isArray(q.subQuestion.triggerValues) && q.subQuestion.triggerValues.includes(String(value))) {
+                        const subVal = formData[q.subQuestion.id];
+                        if (subVal) {
+                           subLabel = findLabel(subVal, q.subQuestion.options || []);
+                        }
+                    }
+                 }
+                 // Always add the key (even if empty) to ensure column order is preserved in Google Sheet
+                 payload[q.subQuestion.text] = subLabel;
+            }
         });
     });
     return payload;
@@ -576,7 +582,7 @@ export default function App() {
             method: 'POST',
             mode: 'no-cors',
             headers: {
-                'Content-Type': 'text/plain', // Important: text/plain prevents preflight check
+                'Content-Type': 'text/plain', // Important: text/plain prevents preflight check and works best with Apps Script
             },
             body: JSON.stringify(payload)
         });

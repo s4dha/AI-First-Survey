@@ -1,7 +1,7 @@
 
 import { SurveySection, QuestionType } from './types';
 
-export const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwf_qivnd3LBEuCBdFgotgJcrQMF3e5t21jiEV7-Xa4JNfBegPsBg0ZuXonYVTQKBLz/exec";
+export const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxJSfQ4zezfuWUPS9oSEbvD4EG-ZNGfaPoWRj-jaM88jKu1NI8lKZC9pqv7lUGCRxf6g/exec";
 
 export const SURVEY_DATA: SurveySection[] = [
   {
