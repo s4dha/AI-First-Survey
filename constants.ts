@@ -107,7 +107,7 @@ export const SURVEY_DATA: SurveySection[] = [
         text: "Q6. What was your biggest mindset breakthrough during the AI-First journey?",
         description: 'Example: "I realized AI isn\'t difficult—it\'s a learnable skill" or "I now see myself as someone who can build solutions"',
         type: QuestionType.TEXTAREA,
-        required: false,
+        required: true,
       },
       {
         id: "q7_transformation",
@@ -303,21 +303,21 @@ export const SURVEY_DATA: SurveySection[] = [
             text: "Q15. What is your biggest personal win or transformation story from AI-First?",
             description: "Example: Share a specific moment, solution, or realisation that made the biggest difference for you",
             type: QuestionType.TEXTAREA,
-            required: false,
+            required: true,
         },
         {
             id: "q16_success_factors",
             text: "Q16. In your view, what were the critical success factors for AI-First?",
             description: "Example: What made it work? What enabled your success or the success you observed?",
             type: QuestionType.TEXTAREA,
-            required: false,
+            required: true,
         },
         {
             id: "q17_culture_shifts",
             text: "Q17. Have you observed any organisational culture shifts in your division because of AI-First?",
             description: "Example: Changes in how people work, collaborate, experiment, building solutions directly or think about innovation",
             type: QuestionType.TEXTAREA,
-            required: false,
+            required: true,
         },
     ]
   },
