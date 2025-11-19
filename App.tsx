@@ -202,7 +202,7 @@ const QuestionRenderer: React.FC<{
                     type="checkbox"
                     checked={selectedValues.includes(opt.value)}
                     onChange={() => onCheckboxChange(opt.value)}
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-gray-200 text-indigo-600 focus:ring-indigo-500"
                   />
                   <span className="ml-3 text-sm text-gray-700">{opt.label}</span>
                 </label>
@@ -262,7 +262,7 @@ const QuestionRenderer: React.FC<{
                           type="checkbox"
                           checked={isChecked}
                           onChange={handleChange}
-                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          className="h-4 w-4 rounded border-gray-200 text-indigo-600 focus:ring-indigo-500"
                         />
                         <span className="ml-3 text-sm text-gray-700">{opt.label}</span>
                       </label>
@@ -305,7 +305,7 @@ const QuestionRenderer: React.FC<{
                     value={opt.value}
                     checked={formData[question.id] === opt.value}
                     onChange={(e) => handleInputChange(question.id, e.target.value)}
-                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 border-gray-200 text-indigo-600 focus:ring-indigo-500"
                     />
                     <span className="ml-3 text-sm text-gray-700">{opt.label}</span>
                 </label>
@@ -337,7 +337,7 @@ const QuestionRenderer: React.FC<{
                           value={subOpt.value}
                           checked={formData[question.subQuestion.id] === subOpt.value}
                           onChange={(e) => handleInputChange(question.subQuestion.id, e.target.value)}
-                          className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          className="h-4 w-4 border-gray-200 text-indigo-600 focus:ring-indigo-500"
                         />
                         <span className="ml-3 text-sm text-gray-700">{subOpt.label}</span>
                       </label>
@@ -746,7 +746,7 @@ export default function App() {
       <div className="container mx-auto max-w-4xl py-8 px-4 pt-6">
         <div className="text-center mb-8">
           <p className="text-gray-600 max-w-2xl mx-auto">Over the past months, you've been part of AI-First—sprints, workshops, clinics, and showcases. This survey captures what worked, what transformed, and where we go next. Your insights shape Phase 2.</p>
-          <p className="mt-2 text-sm text-indigo-600 font-semibold">Estimated time: 10 minutes</p>
+          <p className="mt-2 text-sm text-indigo-600 font-semibold">Estimated time: 5 minutes</p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>

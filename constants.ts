@@ -3,7 +3,6 @@ import { SurveySection, QuestionType } from './types';
 
 export const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJXK8HcKP00s2gH8vweH6pqtNS7osRUl-vsxQdSOncBEWF6CUtOa1-1Yjg8OZJQAqpiw/exec";
 
-
 export const SURVEY_DATA: SurveySection[] = [
   {
     title: "SECTION 1: ABOUT YOU",
@@ -105,7 +104,7 @@ export const SURVEY_DATA: SurveySection[] = [
       {
         id: "q6_breakthrough",
         text: "Q6. What was your biggest mindset breakthrough during the AI-First journey?",
-        description: 'Example: "I realized AI isn\'t difficult—it\'s a learnable skill" or "I now see myself as someone who can build solutions"',
+        description: 'Example: "I realized AI isn\'t magic—it\'s a learnable skill" or "I now see myself as someone who can build solutions"',
         type: QuestionType.TEXTAREA,
         required: true,
       },
@@ -170,7 +169,8 @@ export const SURVEY_DATA: SurveySection[] = [
                 id: "q9a_adoption",
                 text: "Has your solution been adopted by others beyond your immediate team?",
                 type: QuestionType.RADIO,
-                triggerValues: ["yes_multiple", "yes_one"],
+                // Added prototype_only to trigger list as requested (the first 3 options)
+                triggerValues: ["yes_multiple", "yes_one", "prototype_only"],
                 options: [
                     { value: "yes_other_teams_division", label: "Yes, by other teams in my division" },
                     { value: "yes_other_divisions", label: "Yes, by other divisions in SCG" },
@@ -279,10 +279,9 @@ export const SURVEY_DATA: SurveySection[] = [
         {
             id: "q14_pain_points",
             text: "Q14. What were your main pain points or challenges during AI-First?",
-            description: "Choose your top THREE pain points",
-            type: QuestionType.MULTI_SELECT_CHECKBOX,
+            description: "Check all that apply.",
+            type: QuestionType.CHECKBOX,
             required: true,
-            limit: 3,
             options: [
                 { value: "time", label: "Time constraints — Too busy with BAU work" },
                 { value: "complexity", label: "Technical complexity — Steep learning curve" },
@@ -351,7 +350,7 @@ export const SURVEY_DATA: SurveySection[] = [
         {
             id: "q19_blockers",
             text: "Q19. What are your biggest blockers or barriers in continuing to use AI tools?",
-            description: "Choose your top THREE blockers",
+            description: "Choose your top THREE to prioritize",
             type: QuestionType.MULTI_SELECT_CHECKBOX,
             required: true,
             limit: 3,
@@ -376,7 +375,7 @@ export const SURVEY_DATA: SurveySection[] = [
             text: "Q20. How can SCG be an exemplary AI adoption model for other public sector corporate functions?",
             description: 'Think bold: What would make other agencies say "We want what SCG has"?',
             type: QuestionType.TEXTAREA,
-            required: false,
+            required: true,
         },
     ]
   }
