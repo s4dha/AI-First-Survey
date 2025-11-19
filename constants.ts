@@ -104,7 +104,7 @@ export const SURVEY_DATA: SurveySection[] = [
       {
         id: "q6_breakthrough",
         text: "Q6. What was your biggest mindset breakthrough during the AI-First journey?",
-        description: 'Example: "I realized AI isn\'t magic—it\'s a learnable skill" or "I now see myself as someone who can build solutions"',
+        description: 'Example: "I realized AI isn\'t difficult—it\'s a learnable skill" or "I now see myself as someone who can build solutions"',
         type: QuestionType.TEXTAREA,
         required: true,
       },
