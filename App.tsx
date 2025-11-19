@@ -656,7 +656,10 @@ export default function App() {
             {/* Nav for Dashboard */}
             <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
                 <div className="container mx-auto max-w-6xl px-4 py-4 flex justify-between items-center">
-                    <h1 className="text-xl font-bold text-gray-800">AI-First <span className="text-indigo-600">Analytics</span></h1>
+                    <div className="flex items-center gap-3">
+                         <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
+                         <h1 className="text-xl font-bold text-gray-800">AI-First <span className="text-indigo-600">Analytics</span></h1>
+                    </div>
                     <button
                         onClick={() => setViewMode('survey')}
                         className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors flex items-center"
@@ -708,7 +711,8 @@ export default function App() {
         <div className="sticky top-0 z-40 bg-slate-100/95 backdrop-blur-md border-b border-gray-200 shadow-sm transition-all">
             <div className="container mx-auto max-w-4xl px-4 py-4">
                 <div className="flex justify-between items-center mb-3">
-                     <div>
+                     <div className="flex items-center gap-4">
+                        <img src="/logo.png" alt="Logo" className="h-12 w-auto" />
                         <h1 className="text-xl font-bold text-gray-800">AI-First Impact Survey</h1>
                      </div>
                                               {/* 
