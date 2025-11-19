@@ -134,7 +134,7 @@ const QuestionRenderer: React.FC<{
             name={question.id}
             value={formData[question.id] || ''}
             onChange={(e) => handleInputChange(question.id, e.target.value)}
-            className={`mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${isInvalid ? 'border-red-500' : 'border-gray-300'}`}
+            className={`mt-2 block w-full rounded-md shadow-sm border focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${isInvalid ? 'border-red-500' : 'border-black'}`}
             placeholder="Enter your answer"
           />
         );
@@ -147,7 +147,7 @@ const QuestionRenderer: React.FC<{
               name={question.id}
               value={formData[question.id] || ''}
               onChange={(e) => handleInputChange(question.id, e.target.value)}
-              className={`mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${isInvalid ? 'border-red-500' : 'border-gray-300'}`}
+              className={`mt-2 block w-full rounded-md border shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${isInvalid ? 'border-red-500' : 'border-black'}`}
             >
               {question.options?.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -160,7 +160,7 @@ const QuestionRenderer: React.FC<{
                 type="text"
                 placeholder="Please specify"
                 onChange={(e) => handleInputChange(`${question.id}_other`, e.target.value)}
-                className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-2 block w-full rounded-md border border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
             )}
           </>
@@ -212,7 +212,7 @@ const QuestionRenderer: React.FC<{
                     placeholder={opt.textInputLabel || "Please specify"}
                     value={formData[`${question.id}_${opt.value}_text`] || ''}
                     onChange={(e) => handleInputChange(`${question.id}_${opt.value}_text`, e.target.value)}
-                    className="mt-2 ml-7 block w-full max-w-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-2 ml-7 block w-full max-w-sm rounded-md border border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 )}
               </div>
@@ -272,7 +272,7 @@ const QuestionRenderer: React.FC<{
                           placeholder={opt.textInputLabel || "Please specify"}
                           value={formData[`${question.id}_${opt.value}_text`] || ''}
                           onChange={(e) => handleInputChange(`${question.id}_${opt.value}_text`, e.target.value)}
-                          className="mt-2 ml-7 block w-full max-w-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          className="mt-2 ml-7 block w-full max-w-sm rounded-md border border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                       )}
                     </div>
@@ -316,7 +316,7 @@ const QuestionRenderer: React.FC<{
                         placeholder={opt.textInputLabel || "Please specify"}
                         value={formData[`${question.id}_${opt.value}_text`] || ''}
                         onChange={(e) => handleInputChange(`${question.id}_${opt.value}_text`, e.target.value)}
-                        className="mt-2 ml-7 block w-full max-w-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="mt-2 ml-7 block w-full max-w-sm rounded-md border border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
                 )}
               </div>
@@ -358,7 +358,7 @@ const QuestionRenderer: React.FC<{
             rows={4}
             value={formData[question.id] || ''}
             onChange={(e) => handleInputChange(question.id, e.target.value)}
-            className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-2 block w-full rounded-md border border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           ></textarea>
         );
       
