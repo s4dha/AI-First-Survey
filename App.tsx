@@ -476,7 +476,7 @@ const getFreshFormData = (): FormData => {
     const initialData: FormData = {};
     allQuestions.forEach(question => {
         if (question.type === QuestionType.SLIDER_PAIR) {
-            initialData[`${question.id}_before`] = 25;
+            initialData[`${question.id}_before`] = 65;
             initialData[`${question.id}_now`] = 10;
         }
     });
