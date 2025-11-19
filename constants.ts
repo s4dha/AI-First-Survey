@@ -279,9 +279,10 @@ export const SURVEY_DATA: SurveySection[] = [
         {
             id: "q14_pain_points",
             text: "Q14. What were your main pain points or challenges during AI-First?",
-            description: "Check all that apply.",
-            type: QuestionType.CHECKBOX,
+            description: "Choose your top THREE pain points",
+            type: QuestionType.MULTI_SELECT_CHECKBOX,
             required: true,
+            limit: 3,
             options: [
                 { value: "time", label: "Time constraints — Too busy with BAU work" },
                 { value: "complexity", label: "Technical complexity — Steep learning curve" },
