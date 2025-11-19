@@ -9,7 +9,8 @@ export enum QuestionType {
   SLIDER_PAIR = 'SLIDER_PAIR',
   GROUPED_CHECKBOX = 'GROUPED_CHECKBOX',
   CHECKBOX = 'CHECKBOX',
-  TEXT = 'TEXT'
+  TEXT = 'TEXT',
+  LIKERT_MATRIX = 'LIKERT_MATRIX'
 }
 
 export interface Option {
@@ -34,6 +35,7 @@ export interface Question {
   type: QuestionType;
   required: boolean;
   options?: Option[];
+  rows?: { id: string; text: string }[];
   description?: string;
   subQuestion?: SubQuestion;
   limit?: number;

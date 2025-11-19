@@ -169,7 +169,6 @@ export const SURVEY_DATA: SurveySection[] = [
                 id: "q9a_adoption",
                 text: "Has your solution been adopted by others beyond your immediate team?",
                 type: QuestionType.RADIO,
-                // Added prototype_only to trigger list as requested (the first 3 options)
                 triggerValues: ["yes_multiple", "yes_one", "prototype_only"],
                 options: [
                     { value: "yes_other_teams_division", label: "Yes, by other teams in my division" },
@@ -277,11 +276,35 @@ export const SURVEY_DATA: SurveySection[] = [
             ],
         },
         {
+            id: "q13a_formats",
+            text: "Q13a. Rate each AI-First format you experienced:",
+            description: "(1 = Not effective, 5 = Extremely effective)",
+            type: QuestionType.LIKERT_MATRIX,
+            required: true,
+            rows: [
+                { id: "sprints", text: "Monthly Sprints" },
+                { id: "clinics", text: "Weekly AI Clinics (office hours)" },
+                { id: "workshops", text: "Workshops (Lorong AI and Manus)" },
+                { id: "visit", text: "Experiential Visit (Changi Airport)" },
+                { id: "showcases", text: "Showcases (CLW, Discover)" },
+            ],
+            options: [
+                { value: "1", label: "1" },
+                { value: "2", label: "2" },
+                { value: "3", label: "3" },
+                { value: "4", label: "4" },
+                { value: "5", label: "5" },
+                { value: "na", label: "N/A" },
+            ]
+        },
+        {
             id: "q14_pain_points",
             text: "Q14. What were your main pain points or challenges during AI-First?",
-            description: "Check all that apply.",
-            type: QuestionType.CHECKBOX,
-            required: true,
+            description: "Choose your top THREE blockers",
+             type: QuestionType.MULTI_SELECT_CHECKBOX,
+        required: true,
+        limit: 3,
+
             options: [
                 { value: "time", label: "Time constraints — Too busy with BAU work" },
                 { value: "complexity", label: "Technical complexity — Steep learning curve" },
@@ -299,8 +322,8 @@ export const SURVEY_DATA: SurveySection[] = [
         },
         {
             id: "q15_personal_win",
-            text: "Q15. What is your biggest personal win or transformation story from AI-First?",
-            description: "Example: Share a specific moment, solution, or realisation that made the biggest difference for you",
+            text: "Q15. What is your biggest personal win from AI-First?",
+            description: "E.g. What you built and the impact (e.g. My team built AppraisAI trained on GovTech schemas and best practices to guide the crafting of impact-focused and evidence based performance evaluations. Reduced evaluation writing time from days to hours.)",
             type: QuestionType.TEXTAREA,
             required: true,
         },

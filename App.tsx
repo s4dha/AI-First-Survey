@@ -48,13 +48,24 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
         section.questions.forEach(q => {
             const value = formData[q.id];
             
-            let answerLabel = "";
-
             // Helper to find label from options
             const findLabel = (val: string, opts: Option[]) => {
                 const opt = opts.find(o => o.value === val);
                 return opt ? opt.label : val;
             }
+
+            // Special handling for Matrix: flatten into separate columns
+            if (q.type === QuestionType.LIKERT_MATRIX && q.rows) {
+                 q.rows.forEach(row => {
+                     const rowVal = value ? value[row.id] : '';
+                     // Header format: "Q12a. ... [Monthly Sprints]"
+                     payload[`${q.text} [${row.text}]`] = rowVal || "";
+                 });
+                 // Do not process matrix as a single column
+                 return; 
+            }
+
+            let answerLabel = "";
 
             // Handle different question types to format the output string
             if (q.type === QuestionType.CHECKBOX || q.type === QuestionType.MULTI_SELECT_CHECKBOX || q.type === QuestionType.CHECKBOX_WITH_TEXT || q.type === QuestionType.GROUPED_CHECKBOX) {
@@ -87,16 +98,6 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
                              answerLabel += ` (${formData[otherKey]})`;
                          }
                     }
-
-                    // Handle Subquestion
-                    if (q.subQuestion && Array.isArray(q.subQuestion.triggerValues) && q.subQuestion.triggerValues.includes(String(value))) {
-                        const subVal = formData[q.subQuestion.id];
-                        if (subVal) {
-                           const subLabel = findLabel(subVal, q.subQuestion.options);
-                           // Add subquestion response as a separate column for clarity
-                           payload[q.subQuestion.text] = subLabel;
-                        }
-                    }
                 }
             } else if (q.type === QuestionType.SLIDER_PAIR) {
                 const before = formData[`${q.id}_before`];
@@ -110,6 +111,22 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
 
             // Use the Question Text as the Header Key
             payload[q.text] = answerLabel;
+
+            // CRITICAL: Handle Subquestion immediately after main question to ensure column adjacency
+            if (q.subQuestion) {
+                 // Always generate the column key so the sheet structure is stable
+                 let subLabel = "";
+                 
+                 // Only populate if logic triggers
+                 if (q.type === QuestionType.CONDITIONAL_RADIO && Array.isArray(q.subQuestion.triggerValues) && q.subQuestion.triggerValues.includes(String(value))) {
+                     const subVal = formData[q.subQuestion.id];
+                     if (subVal) {
+                        subLabel = findLabel(subVal, q.subQuestion.options);
+                     }
+                 }
+                 
+                 payload[q.subQuestion.text] = subLabel;
+            }
         });
     });
     return payload;
@@ -134,7 +151,7 @@ const QuestionRenderer: React.FC<{
             name={question.id}
             value={formData[question.id] || ''}
             onChange={(e) => handleInputChange(question.id, e.target.value)}
-            className={`mt-2 block w-full rounded-md shadow-sm border focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${isInvalid ? 'border-red-500' : 'border-gray-200'}`}
+            className={`mt-2 block w-full rounded-md shadow-sm border focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 ${isInvalid ? 'border-red-500' : 'border-gray-300'}`}
             placeholder="Enter your answer"
           />
         );
@@ -147,7 +164,7 @@ const QuestionRenderer: React.FC<{
               name={question.id}
               value={formData[question.id] || ''}
               onChange={(e) => handleInputChange(question.id, e.target.value)}
-              className={`mt-2 block w-full rounded-md border shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${isInvalid ? 'border-red-500' : 'border-gray-200'}`}
+              className={`mt-2 block w-full rounded-md border shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 ${isInvalid ? 'border-red-500' : 'border-gray-300'}`}
             >
               {question.options?.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -160,7 +177,7 @@ const QuestionRenderer: React.FC<{
                 type="text"
                 placeholder="Please specify"
                 onChange={(e) => handleInputChange(`${question.id}_other`, e.target.value)}
-                className="mt-2 block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
               />
             )}
           </>
@@ -202,7 +219,7 @@ const QuestionRenderer: React.FC<{
                     type="checkbox"
                     checked={selectedValues.includes(opt.value)}
                     onChange={() => onCheckboxChange(opt.value)}
-                    className="h-4 w-4 rounded border-gray-200 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
                   <span className="ml-3 text-sm text-gray-700">{opt.label}</span>
                 </label>
@@ -212,7 +229,7 @@ const QuestionRenderer: React.FC<{
                     placeholder={opt.textInputLabel || "Please specify"}
                     value={formData[`${question.id}_${opt.value}_text`] || ''}
                     onChange={(e) => handleInputChange(`${question.id}_${opt.value}_text`, e.target.value)}
-                    className="mt-2 ml-0 sm:ml-7 block w-full sm:w-[calc(100%-2rem)] max-w-sm rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-2 ml-0 sm:ml-7 block w-full sm:w-[calc(100%-2rem)] max-w-sm rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
                   />
                 )}
               </div>
@@ -262,7 +279,7 @@ const QuestionRenderer: React.FC<{
                           type="checkbox"
                           checked={isChecked}
                           onChange={handleChange}
-                          className="h-4 w-4 rounded border-gray-200 text-indigo-600 focus:ring-indigo-500"
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                         />
                         <span className="ml-3 text-sm text-gray-700">{opt.label}</span>
                       </label>
@@ -272,7 +289,7 @@ const QuestionRenderer: React.FC<{
                           placeholder={opt.textInputLabel || "Please specify"}
                           value={formData[`${question.id}_${opt.value}_text`] || ''}
                           onChange={(e) => handleInputChange(`${question.id}_${opt.value}_text`, e.target.value)}
-                          className="mt-2 ml-0 sm:ml-7 block w-full sm:w-[calc(100%-2rem)] max-w-sm rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          className="mt-2 ml-0 sm:ml-7 block w-full sm:w-[calc(100%-2rem)] max-w-sm rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
                         />
                       )}
                     </div>
@@ -305,7 +322,7 @@ const QuestionRenderer: React.FC<{
                     value={opt.value}
                     checked={formData[question.id] === opt.value}
                     onChange={(e) => handleInputChange(question.id, e.target.value)}
-                    className="h-4 w-4 border-gray-200 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <span className="ml-3 text-sm text-gray-700">{opt.label}</span>
                 </label>
@@ -316,7 +333,7 @@ const QuestionRenderer: React.FC<{
                         placeholder={opt.textInputLabel || "Please specify"}
                         value={formData[`${question.id}_${opt.value}_text`] || ''}
                         onChange={(e) => handleInputChange(`${question.id}_${opt.value}_text`, e.target.value)}
-                        className="mt-2 ml-0 sm:ml-7 block w-full sm:w-[calc(100%-2rem)] max-w-sm rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="mt-2 ml-0 sm:ml-7 block w-full sm:w-[calc(100%-2rem)] max-w-sm rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
                     />
                 )}
               </div>
@@ -337,7 +354,7 @@ const QuestionRenderer: React.FC<{
                           value={subOpt.value}
                           checked={formData[question.subQuestion.id] === subOpt.value}
                           onChange={(e) => handleInputChange(question.subQuestion.id, e.target.value)}
-                          className="h-4 w-4 border-gray-200 text-indigo-600 focus:ring-indigo-500"
+                          className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
                         />
                         <span className="ml-3 text-sm text-gray-700">{subOpt.label}</span>
                       </label>
@@ -350,6 +367,36 @@ const QuestionRenderer: React.FC<{
           </div>
         );
 
+      case QuestionType.LIKERT_MATRIX:
+          const currentValues = formData[question.id] || {};
+          return (
+              <div className="mt-4 space-y-4">
+                  {question.rows?.map((row) => (
+                      <div key={row.id} className="py-3 border-b border-gray-100 last:border-0">
+                          <p className="text-sm font-medium text-gray-700 mb-2">{row.text}</p>
+                          <div className="flex flex-wrap gap-3">
+                              {question.options?.map((opt) => (
+                                  <label key={`${row.id}-${opt.value}`} className="flex items-center space-x-1 cursor-pointer">
+                                      <input
+                                          type="radio"
+                                          name={`${question.id}-${row.id}`}
+                                          value={opt.value}
+                                          checked={currentValues[row.id] === opt.value}
+                                          onChange={(e) => {
+                                              const newVal = { ...currentValues, [row.id]: e.target.value };
+                                              handleInputChange(question.id, newVal);
+                                          }}
+                                          className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                      />
+                                      <span className="text-xs sm:text-sm text-gray-600">{opt.label}</span>
+                                  </label>
+                              ))}
+                          </div>
+                      </div>
+                  ))}
+              </div>
+          );
+
       case QuestionType.TEXTAREA:
         return (
           <textarea
@@ -358,7 +405,7 @@ const QuestionRenderer: React.FC<{
             rows={4}
             value={formData[question.id] || ''}
             onChange={(e) => handleInputChange(question.id, e.target.value)}
-            className="mt-2 block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
           ></textarea>
         );
       
@@ -433,6 +480,13 @@ const calculateProgress = (formData: FormData): number => {
             if (q.type === QuestionType.SLIDER_PAIR) {
                 if (formData[`${q.id}_before`] != null && formData[`${q.id}_now`] != null) {
                     isAnswered = true;
+                }
+            } else if (q.type === QuestionType.LIKERT_MATRIX) {
+                // For Matrix, ALL rows must have a value to count as answered if required
+                if (q.rows) {
+                    const vals = value || {};
+                    const allRowsAnswered = q.rows.every(row => vals[row.id] !== undefined && vals[row.id] !== '');
+                    if (allRowsAnswered) isAnswered = true;
                 }
             } else if (Array.isArray(value)) {
                 if (value.length > 0) {
@@ -576,6 +630,13 @@ export default function App() {
         const nowValue = formData[`${q.id}_now`];
         if (beforeValue === undefined || beforeValue === null || nowValue === undefined || nowValue === null) {
           isInvalid = true;
+        }
+      } else if (q.type === QuestionType.LIKERT_MATRIX) {
+        // Check if all rows are answered
+        const val = formData[q.id] || {};
+        if (q.rows) {
+            const allAnswered = q.rows.every(row => val[row.id] !== undefined && val[row.id] !== '');
+            if (!allAnswered) isInvalid = true;
         }
       } else {
         const value = formData[q.id];
