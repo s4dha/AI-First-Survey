@@ -39,11 +39,11 @@ const storage = {
 
 // Prepare the payload for Google Sheets (human-readable)
 const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) => {
-    // 1. Create payload with 'Submitted At' as the very first key
-    const payload: any = {
-        'Submitted At': new Date().toLocaleString()
-    };
+    const payload: any = {};
     
+    // Add submitted timestamp explicitly (though sheet script also does it)
+    payload['Submitted At'] = new Date().toLocaleString();
+
     surveyData.forEach(section => {
         section.questions.forEach(q => {
             const value = formData[q.id];
@@ -52,11 +52,11 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
 
             // Helper to find label from options
             const findLabel = (val: string, opts: Option[]) => {
-                const opt = opts?.find(o => o.value === val);
+                const opt = opts.find(o => o.value === val);
                 return opt ? opt.label : val;
             }
 
-            // Calculate Answer Label
+            // Handle different question types to format the output string
             if (q.type === QuestionType.CHECKBOX || q.type === QuestionType.MULTI_SELECT_CHECKBOX || q.type === QuestionType.CHECKBOX_WITH_TEXT || q.type === QuestionType.GROUPED_CHECKBOX) {
                 if (Array.isArray(value)) {
                     answerLabel = value.map(val => {
@@ -73,12 +73,29 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
                 if (value !== undefined && value !== null && value !== "") {
                     answerLabel = findLabel(value as string, q.options || []);
                     
-                    // Handle "Other" text input for dropdown/radio
-                    if (value === 'other' || value === 'Other') {
+                    // Handle "Other" text input for dropdown/radio or specific hasTextInput fields
+                    const selectedOpt = q.options?.find(o => o.value === value);
+                    if ((value === 'other' || value === 'Other') || (selectedOpt?.hasTextInput)) {
+                         // For radios with text input, we use the same naming convention as checkboxes: questionId_value_text
+                         // For simple 'other', we check legacy convention questionId_other
+                         const specificTextKey = `${q.id}_${value}_text`;
                          const otherKey = `${q.id}_other`;
-                         if (formData[otherKey]) {
+                         
+                         if (formData[specificTextKey]) {
+                             answerLabel += ` (${formData[specificTextKey]})`;
+                         } else if (formData[otherKey]) {
                              answerLabel += ` (${formData[otherKey]})`;
                          }
+                    }
+
+                    // Handle Subquestion
+                    if (q.subQuestion && Array.isArray(q.subQuestion.triggerValues) && q.subQuestion.triggerValues.includes(String(value))) {
+                        const subVal = formData[q.subQuestion.id];
+                        if (subVal) {
+                           const subLabel = findLabel(subVal, q.subQuestion.options);
+                           // Add subquestion response as a separate column for clarity
+                           payload[q.subQuestion.text] = subLabel;
+                        }
                     }
                 }
             } else if (q.type === QuestionType.SLIDER_PAIR) {
@@ -91,24 +108,8 @@ const prepareSheetPayload = (formData: FormData, surveyData: SurveySection[]) =>
                 answerLabel = value !== undefined ? String(value) : "";
             }
 
-            // 2. Add Main Question Key
+            // Use the Question Text as the Header Key
             payload[q.text] = answerLabel;
-
-            // 3. Add Sub-Question Key IMMEDIATELY after Main Question
-            if (q.type === QuestionType.CONDITIONAL_RADIO && q.subQuestion) {
-                 let subLabel = "";
-                 // Check if the main value triggers the subquestion
-                 if (value !== undefined && value !== null && value !== "") {
-                    if (Array.isArray(q.subQuestion.triggerValues) && q.subQuestion.triggerValues.includes(String(value))) {
-                        const subVal = formData[q.subQuestion.id];
-                        if (subVal) {
-                           subLabel = findLabel(subVal, q.subQuestion.options || []);
-                        }
-                    }
-                 }
-                 // Always add the key (even if empty) to ensure column order is preserved in Google Sheet
-                 payload[q.subQuestion.text] = subLabel;
-            }
         });
     });
     return payload;
@@ -125,6 +126,19 @@ const QuestionRenderer: React.FC<{
   
   const renderInput = () => {
     switch (question.type) {
+      case QuestionType.TEXT:
+        return (
+          <input
+            type="text"
+            id={question.id}
+            name={question.id}
+            value={formData[question.id] || ''}
+            onChange={(e) => handleInputChange(question.id, e.target.value)}
+            className={`mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${isInvalid ? 'border-red-500' : 'border-gray-300'}`}
+            placeholder="Enter your answer"
+          />
+        );
+
       case QuestionType.DROPDOWN:
         return (
           <>
@@ -283,17 +297,29 @@ const QuestionRenderer: React.FC<{
         return (
           <div className="mt-2 space-y-3">
             {question.options?.map((opt) => (
-              <label key={opt.value} className="flex items-center">
-                <input
-                  type="radio"
-                  name={question.id}
-                  value={opt.value}
-                  checked={formData[question.id] === opt.value}
-                  onChange={(e) => handleInputChange(question.id, e.target.value)}
-                  className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="ml-3 text-sm text-gray-700">{opt.label}</span>
-              </label>
+              <div key={opt.value}>
+                <label className="flex items-center">
+                    <input
+                    type="radio"
+                    name={question.id}
+                    value={opt.value}
+                    checked={formData[question.id] === opt.value}
+                    onChange={(e) => handleInputChange(question.id, e.target.value)}
+                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="ml-3 text-sm text-gray-700">{opt.label}</span>
+                </label>
+                {/* Render text input if selected and hasTextInput is true */}
+                {opt.hasTextInput && formData[question.id] === opt.value && (
+                    <input
+                        type="text"
+                        placeholder={opt.textInputLabel || "Please specify"}
+                        value={formData[`${question.id}_${opt.value}_text`] || ''}
+                        onChange={(e) => handleInputChange(`${question.id}_${opt.value}_text`, e.target.value)}
+                        className="mt-2 ml-7 block w-full max-w-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                )}
+              </div>
             ))}
             {subQuestionIsVisible && question.subQuestion && (
               <div className="mt-4 pt-4 pl-6 border-l-2 border-indigo-200">
@@ -495,7 +521,7 @@ export default function App() {
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: "-40% 0px -60% 0px",
+      rootMargin: "-100px 0px -80% 0px", // Adjust margins for sticky header
       threshold: 0,
     };
 
@@ -582,7 +608,7 @@ export default function App() {
             method: 'POST',
             mode: 'no-cors',
             headers: {
-                'Content-Type': 'text/plain', // Important: text/plain prevents preflight check and works best with Apps Script
+                'Content-Type': 'text/plain', // Important: text/plain prevents preflight check
             },
             body: JSON.stringify(payload)
         });
@@ -675,37 +701,42 @@ export default function App() {
   // Render Survey View
   return (
     <div className="bg-slate-100 min-h-screen font-sans">
-      <div className="container mx-auto max-w-4xl py-8 px-4">
-        {/* Nav for Survey Mode */}
-        <div className="flex justify-end mb-4">
-            <button
-                onClick={() => setViewMode('dashboard')}
-                className="text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors"
-            >
-                View Analysis Dashboard
-            </button>
-        </div>
-
-        <header className="text-center p-6 bg-white rounded-xl shadow-lg mb-8 border-t-4 border-indigo-500">
-          <h1 className="text-4xl font-bold text-gray-800">AI-First Impact Survey</h1>
-          <p className="mt-3 text-gray-600">Over the past months, you've been part of AI-First—sprints, workshops, clinics, and showcases. This survey captures what worked, what transformed, and where we go next. Your insights shape Phase 2.</p>
-          <p className="mt-2 text-sm text-indigo-600 font-semibold">Estimated time: 10 minutes</p>
-
-          <div className="mt-6">
-            <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-600 truncate pr-2">
-                    Current: <span className="font-semibold text-indigo-700">{currentSectionTitle}</span>
-                </span>
-                <span className="text-sm font-medium text-indigo-700">{progressPercent}% Complete</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div 
-                    className="bg-indigo-600 h-2.5 rounded-full transition-all duration-500" 
-                    style={{ width: `${progressPercent}%` }}>
+      
+        {/* Floating Sticky Header */}
+        <div className="sticky top-0 z-40 bg-slate-100/95 backdrop-blur-md border-b border-gray-200 shadow-sm transition-all">
+            <div className="container mx-auto max-w-4xl px-4 py-4">
+                <div className="flex justify-between items-center mb-3">
+                     <div>
+                        <h1 className="text-xl font-bold text-gray-800">AI-First Impact Survey</h1>
+                     </div>
+                    <button
+                        onClick={() => setViewMode('dashboard')}
+                        className="text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors"
+                    >
+                        View Dashboard
+                    </button>
+                </div>
+                
+                <div className="flex justify-between items-center mb-1 text-xs">
+                    <span className="font-medium text-gray-600 truncate pr-2">
+                        Current: <span className="font-semibold text-indigo-700">{currentSectionTitle}</span>
+                    </span>
+                    <span className="font-medium text-indigo-700">{progressPercent}% Complete</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                        className="bg-indigo-600 h-2 rounded-full transition-all duration-500" 
+                        style={{ width: `${progressPercent}%` }}>
+                    </div>
                 </div>
             </div>
-          </div>
-        </header>
+        </div>
+
+      <div className="container mx-auto max-w-4xl py-8 px-4 pt-6">
+        <div className="text-center mb-8">
+          <p className="text-gray-600 max-w-2xl mx-auto">Over the past months, you've been part of AI-First—sprints, workshops, clinics, and showcases. This survey captures what worked, what transformed, and where we go next. Your insights shape Phase 2.</p>
+          <p className="mt-2 text-sm text-indigo-600 font-semibold">Estimated time: 10 minutes</p>
+        </div>
 
         <form onSubmit={handleSubmit} noValidate>
           {SURVEY_DATA.map((section, sectionIndex) => (
@@ -714,7 +745,7 @@ export default function App() {
               className="mb-10"
               ref={el => { sectionRefs.current[sectionIndex] = el; }}
             >
-              <div className="bg-indigo-600 text-white p-4 rounded-t-lg shadow-md">
+              <div className="bg-indigo-600 text-white p-4 rounded-t-lg shadow-md sticky top-[108px] z-30">
                 <h2 className="text-2xl font-bold">{section.title}</h2>
                 {section.description && <p className="text-indigo-200 text-sm mt-1">{section.description}</p>}
               </div>
@@ -732,7 +763,7 @@ export default function App() {
             </div>
           ))}
 
-          <div className="sticky bottom-0 bg-white/80 backdrop-blur-sm p-4 border-t border-gray-200 shadow-lg flex justify-end items-center mt-8 rounded-t-xl">
+          <div className="sticky bottom-0 bg-white/80 backdrop-blur-sm p-4 border-t border-gray-200 shadow-lg flex justify-end items-center mt-8 rounded-t-xl z-40">
              {invalidQuestionIds.size > 0 && <p className='text-red-600 mr-4 text-sm font-medium'>Please fill out all required fields.</p>}
             <button
               type="submit"

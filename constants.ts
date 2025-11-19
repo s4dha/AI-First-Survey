@@ -3,14 +3,21 @@ import { SurveySection, QuestionType } from './types';
 
 export const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxJSfQ4zezfuWUPS9oSEbvD4EG-ZNGfaPoWRj-jaM88jKu1NI8lKZC9pqv7lUGCRxf6g/exec";
 
+
 export const SURVEY_DATA: SurveySection[] = [
   {
     title: "SECTION 1: ABOUT YOU",
-    description: "2 questions",
+    description: "4 questions",
     questions: [
       {
-        id: "q1_division",
-        text: "Q1. Which SCG/Corporate Division are you from?",
+        id: "q1_email",
+        text: "Q1. What is your email address?",
+        type: QuestionType.TEXT,
+        required: true,
+      },
+      {
+        id: "q2_division",
+        text: "Q2. Which SCG/Corporate Division are you from?",
         type: QuestionType.DROPDOWN,
         required: true,
         options: [
@@ -30,8 +37,8 @@ export const SURVEY_DATA: SurveySection[] = [
         ],
       },
       {
-        id: "q2_activities",
-        text: "Q2. Which AI-First activities did you participate in?",
+        id: "q3_activities",
+        text: "Q3. Which AI-First activities did you participate in?",
         description: "Include team name where applicable. Check all that apply.",
         type: QuestionType.CHECKBOX_WITH_TEXT,
         required: true,
@@ -50,8 +57,8 @@ export const SURVEY_DATA: SurveySection[] = [
         ],
       },
       {
-        id: "q2a_hours",
-        text: "Q2a. How many hours on average did you spend on AI-First activities (sprints, workshop, clinics) per week ?",
+        id: "q3a_hours",
+        text: "Q3a. How many hours on average did you spend on AI-First activities (sprints, workshop, clinics) per week ?",
         type: QuestionType.RADIO,
         required: true,
         options: [
@@ -70,8 +77,8 @@ export const SURVEY_DATA: SurveySection[] = [
     description: "4 questions",
     questions: [
       {
-        id: "q3_confidence_before",
-        text: "Q3. Before AI-First, how confident were you that you could build an AI solution directly (e.g., using AIBots, Pair or vibe coding)?",
+        id: "q4_confidence_before",
+        text: "Q4. Before AI-First, how confident were you that you could build an AI solution directly (e.g., using AIBots, Pair or vibe coding)?",
         type: QuestionType.RADIO,
         required: true,
         options: [
@@ -83,8 +90,8 @@ export const SURVEY_DATA: SurveySection[] = [
         ],
       },
       {
-        id: "q4_confidence_now",
-        text: "Q4. NOW, how confident are you that you can build an AI solution directly?",
+        id: "q5_confidence_now",
+        text: "Q5. NOW, how confident are you that you can build an AI solution directly?",
         type: QuestionType.RADIO,
         required: true,
         options: [
@@ -96,15 +103,15 @@ export const SURVEY_DATA: SurveySection[] = [
         ],
       },
       {
-        id: "q5_breakthrough",
-        text: "Q5. What was your biggest mindset breakthrough during the AI-First journey?",
-        description: 'Example: "I realized AI isn\'t magic—it\'s a learnable skill" or "I now see myself as someone who can build solutions"',
+        id: "q6_breakthrough",
+        text: "Q6. What was your biggest mindset breakthrough during the AI-First journey?",
+        description: 'Example: "I realized AI isn\'t difficult—it\'s a learnable skill" or "I now see myself as someone who can build solutions"',
         type: QuestionType.TEXTAREA,
         required: false,
       },
       {
-        id: "q6_transformation",
-        text: "Q6. How has AI-First transformed the way you think, work and solve problems at work?",
+        id: "q7_transformation",
+        text: "Q7. How has AI-First transformed the way you think, work and solve problems at work?",
         type: QuestionType.RADIO,
         required: true,
         options: [
@@ -122,8 +129,8 @@ export const SURVEY_DATA: SurveySection[] = [
     description: "3 questions",
     questions: [
         {
-            id: "q7_time_before",
-            text: "Q7. Before AI-First, how long would it have taken you or your team to build a solution or prototype?",
+            id: "q8_time_before",
+            text: "Q8. Before AI-First, how long would it have taken you or your team to build a solution or prototype?",
             type: QuestionType.RADIO,
             required: true,
             options: [
@@ -135,8 +142,8 @@ export const SURVEY_DATA: SurveySection[] = [
             ],
         },
         {
-            id: "q8_time_now",
-            text: "Q8. NOW, how long does it take you or your team to build an AI solution or prototype?",
+            id: "q9_time_now",
+            text: "Q9. NOW, how long does it take you or your team to build an AI solution or prototype?",
             type: QuestionType.RADIO,
             required: true,
             options: [
@@ -148,19 +155,19 @@ export const SURVEY_DATA: SurveySection[] = [
             ],
         },
         {
-            id: "q8a_deployed",
-            text: "Q8a. Have you or your team built and deployed AI solutions?",
+            id: "q9a_deployed",
+            text: "Q9a. Have you or your team built and deployed AI solutions?",
             type: QuestionType.CONDITIONAL_RADIO,
             required: true,
             options: [
-                { value: "yes_multiple", label: "Yes, multiple solutions actively used" },
-                { value: "yes_one", label: "Yes, one solution actively used" },
-                { value: "prototype_only", label: "Built prototype, not yet deployed" },
+                { value: "yes_multiple", label: "Yes, multiple solutions actively used", hasTextInput: true, textInputLabel: "Name of tool/solution" },
+                { value: "yes_one", label: "Yes, one solution actively used", hasTextInput: true, textInputLabel: "Name of tool/solution" },
+                { value: "prototype_only", label: "Built prototype, not yet deployed", hasTextInput: true, textInputLabel: "Name of tool/solution" },
                 { value: "exploring", label: "Still exploring" },
                 { value: "not_yet", label: "Not yet" },
             ],
             subQuestion: {
-                id: "q8a_adoption",
+                id: "q9a_adoption",
                 text: "Has your solution been adopted by others beyond your immediate team?",
                 type: QuestionType.RADIO,
                 triggerValues: ["yes_multiple", "yes_one"],
@@ -182,8 +189,8 @@ export const SURVEY_DATA: SurveySection[] = [
     description: "3 questions",
     questions: [
       {
-        id: "q9_top_tasks",
-        text: "Q9. What are the top 3 Time-Intensive Repetitive Tasks that consume MOST time in your typical work week?",
+        id: "q10_top_tasks",
+        text: "Q10. What are the top 3 Time-Intensive Repetitive Tasks that consume MOST time in your typical work week?",
         type: QuestionType.MULTI_SELECT_CHECKBOX,
         required: true,
         limit: 3,
@@ -205,14 +212,14 @@ export const SURVEY_DATA: SurveySection[] = [
         ],
       },
       {
-        id: "q10_time_spent",
-        text: "Q10. Time spent on mundane, repetitive and time-consuming work:",
+        id: "q11_time_spent",
+        text: "Q11. Time spent on mundane, repetitive and time-consuming work:",
         type: QuestionType.SLIDER_PAIR,
         required: true,
       },
       {
-        id: "q11_how_ai_changed",
-        text: "Q11. How has AI changed the way you work?",
+        id: "q12_how_ai_changed",
+        text: "Q12. How has AI changed the way you work?",
         description: "Check all that apply.",
         type: QuestionType.GROUPED_CHECKBOX,
         required: true,
@@ -241,7 +248,6 @@ export const SURVEY_DATA: SurveySection[] = [
           { value: "use_different_tools", label: "I use different tools now", group: "Workflow & Tools" },
           { value: "automated_work", label: "I've automated parts of my work", group: "Workflow & Tools" },
           { value: "built_solutions_for_team", label: "I've built solutions for my team", group: "Workflow & Tools" },
-          // Added options for Impact
           { value: "more_satisfying", label: "I find my work more satisfying", group: "Impact" },
           { value: "less_stress", label: "I feel less stressed by administrative workload", group: "Impact" },
           { value: "better_service", label: "I provide better service to stakeholders", group: "Impact" },
@@ -254,11 +260,11 @@ export const SURVEY_DATA: SurveySection[] = [
   },
   {
     title: "SECTION 5: WHAT WORKED & GREATEST IMPACT",
-    description: "6 questions",
+    description: "5 questions",
     questions: [
         {
-            id: "q12_effectiveness",
-            text: "Q12. How effective was the AI-First programme to build AI capability in SCG (3 sprints, 3 workshops, AI Clinics and closers)?",
+            id: "q13_effectiveness",
+            text: "Q13. How effective was the AI-First programme to build AI capability in SCG (3 sprints, 3 workshops, AI Clinics and closers)?",
             type: QuestionType.RADIO,
             required: true,
             options: [
@@ -271,8 +277,8 @@ export const SURVEY_DATA: SurveySection[] = [
             ],
         },
         {
-            id: "q13_pain_points",
-            text: "Q13. What were your main pain points or challenges during AI-First?",
+            id: "q14_pain_points",
+            text: "Q14. What were your main pain points or challenges during AI-First?",
             description: "Check all that apply.",
             type: QuestionType.CHECKBOX,
             required: true,
@@ -292,22 +298,22 @@ export const SURVEY_DATA: SurveySection[] = [
             ],
         },
         {
-            id: "q14_personal_win",
-            text: "Q14. What is your biggest personal win or transformation story from AI-First?",
+            id: "q15_personal_win",
+            text: "Q15. What is your biggest personal win or transformation story from AI-First?",
             description: "Example: Share a specific moment, solution, or realisation that made the biggest difference for you",
             type: QuestionType.TEXTAREA,
             required: false,
         },
         {
-            id: "q15_success_factors",
-            text: "Q15. In your view, what were the critical success factors for AI-First?",
+            id: "q16_success_factors",
+            text: "Q16. In your view, what were the critical success factors for AI-First?",
             description: "Example: What made it work? What enabled your success or the success you observed?",
             type: QuestionType.TEXTAREA,
             required: false,
         },
         {
-            id: "q16_culture_shifts",
-            text: "Q16. Have you observed any organisational culture shifts in your division because of AI-First?",
+            id: "q17_culture_shifts",
+            text: "Q17. Have you observed any organisational culture shifts in your division because of AI-First?",
             description: "Example: Changes in how people work, collaborate, experiment, building solutions directly or think about innovation",
             type: QuestionType.TEXTAREA,
             required: false,
@@ -319,8 +325,8 @@ export const SURVEY_DATA: SurveySection[] = [
     description: "3 questions",
     questions: [
         {
-            id: "q17_support_needed",
-            text: "Q17. What support do you need most now after AI-First Phase 1 sprints are completed?",
+            id: "q18_support_needed",
+            text: "Q18. What support do you need most now after AI-First Phase 1 sprints are completed?",
             description: "Choose your top THREE to prioritize",
             type: QuestionType.MULTI_SELECT_CHECKBOX,
             required: true,
@@ -342,11 +348,12 @@ export const SURVEY_DATA: SurveySection[] = [
             ],
         },
         {
-            id: "q18_blockers",
-            text: "Q18. What are your biggest blockers or barriers in continuing to use AI tools?",
-            description: "Check all that apply.",
-            type: QuestionType.CHECKBOX,
+            id: "q19_blockers",
+            text: "Q19. What are your biggest blockers or barriers in continuing to use AI tools?",
+            description: "Choose your top THREE blockers",
+            type: QuestionType.MULTI_SELECT_CHECKBOX,
             required: true,
+            limit: 3,
             options: [
                 { value: "time", label: "Time — Too busy to experiment or learn" },
                 { value: "skills", label: "Skills gaps — Technical knowledge or prompting skills" },
@@ -364,8 +371,8 @@ export const SURVEY_DATA: SurveySection[] = [
             ],
         },
         {
-            id: "q19_exemplary_model",
-            text: "Q19. How can SCG be an exemplary AI adoption model for other public sector corporate functions?",
+            id: "q20_exemplary_model",
+            text: "Q20. How can SCG be an exemplary AI adoption model for other public sector corporate functions?",
             description: 'Think bold: What would make other agencies say "We want what SCG has"?',
             type: QuestionType.TEXTAREA,
             required: false,
