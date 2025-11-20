@@ -263,7 +263,7 @@ export const SURVEY_DATA: SurveySection[] = [
     questions: [
         {
             id: "q13_effectiveness",
-            text: "Q13. How effective was the AI-First programme to build AI capability in SCG (3 sprints, 3 workshops, AI Clinics and closers)?",
+            text: "Q13. How effective was the AI-First programme to build AI capability in SCG (3 sprints, 3 workshops, AI Clinics, Closers and Comms and Outreach)?",
             type: QuestionType.RADIO,
             required: true,
             options: [
@@ -287,6 +287,8 @@ export const SURVEY_DATA: SurveySection[] = [
                 { id: "workshops", text: "Workshops (Lorong AI and Manus)" },
                 { id: "visit", text: "Experiential Visit (Changi Airport)" },
                 { id: "showcases", text: "Showcases (CLW, Discover)" },
+                { id: "c&r", text: "Comms and Outreach (AI-First Website, Closers/Townhall, EDMS, Slack Channel)" },
+
             ],
             options: [
                 { value: "1", label: "1" },
