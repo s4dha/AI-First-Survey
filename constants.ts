@@ -124,7 +124,7 @@ export const SURVEY_DATA: SurveySection[] = [
     ],
   },
   {
-    title: "SECTION 3: BUILDING SOLLUTIONS IN DAYS NOT MONTHS",
+    title: "SECTION 3: BUILDING SOLUTIONS IN DAYS NOT MONTHS",
     description: "3 questions",
     questions: [
         {
@@ -184,7 +184,7 @@ export const SURVEY_DATA: SurveySection[] = [
     ]
   },
   {
-    title: "SECTION 4: AI AUGMENTS HUMANS",
+    title: "SECTION 4: AI AUGMENTS HUMAN INTELLIGENCE",
     description: "3 questions",
     questions: [
       {
